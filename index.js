@@ -7,26 +7,59 @@ const morgan = require("morgan");
 const userRoute = require("./routes/users");
 const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
+const path = require("path");
+const router = express.Router()
+const multer = require("multer")
+
 
 dotenv.config();
 
+const port =  5000;
+
 mongoose.connect(
-  process.env.MONGO_URL || 3000,
+  process.env.MONGO_URL,
   { useNewUrlParser: true, useUnifiedTopology: true },
   () => {
     console.log("Connected to MongoDB");
   }
 );
 
+app.use("/images", express.static(path.join(__dirname, "public/images")));
+
 //middleware
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.body.name);
+  },
+});
+
+const upload = multer({ storage: storage });
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  try {
+    return res.status(200).json("File uploded successfully");
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/posts", postRoute);
 
-app.listen(3000, () => {
-  console.log("Backend server is running!");
+
+app.get('/', (req,res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
+app.listen(port, () => {
+  console.log(`Server listening on the port::${port}`);
 });

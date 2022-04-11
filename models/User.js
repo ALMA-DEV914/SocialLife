@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
-    username: {
+    auth_id:{
+      type: String,
+      unique: true,
+      index: true
+    },
+  username: {
       type: String,
       require: true,
       min: 3,
@@ -44,18 +49,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       max: 50,
     },
-    city: {
-      type: String,
-      max: 50,
-    },
-    from: {
-      type: String,
-      max: 50,
-    },
-    relationship: {
-      type: Number,
-      enum: [1, 2, 3],
-    },
+    
   },
   { timestamps: true }
 );

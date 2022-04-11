@@ -19,7 +19,9 @@ router.post("/register", async (req, res) => {
     //save user and respond
     const user = await newUser.save();
     res.status(200).json(user);
+
   } catch (err) {
+    console.log("cannot proccessed")
     res.status(500).json(err)
   }
 });
@@ -38,5 +40,17 @@ router.post("/login", async (req, res) => {
     res.status(500).json(err)
   }
 });
+
+// api endpoint for log out 
+router.post("/logout", (req, res) => {
+  if (req.session.loggedIn) {
+      req.session.destroy(() => {
+          res.status(204).end();
+      });
+  } else {
+      res.status(404).end();
+  }
+});
+
 
 module.exports = router;
